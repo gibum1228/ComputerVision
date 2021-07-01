@@ -68,7 +68,7 @@ inputWidth = 368
 inputScale = 1.0/255
 
 # 이미지 분류 모델 불러오기
-model = tf.keras.models.load_model('alphabet_model.h5')
+model = tf.keras.models.load_model('alphabet_lenet5.h5')
 labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
           'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
@@ -167,7 +167,7 @@ while cv.waitKey(1) < 0:
 
     # predict
     # predict_img = frame[min_y-10: max_y+10, min_x-10: max_x+10].copy()
-    predict_img = cv.resize(frame[min_y-20: max_y+20, min_x-20: max_x+20].copy(), (28, 28), cv.INTER_AREA)
+    predict_img = cv.resize(frame[min_y-20: max_y+20, min_x-20: max_x+20].copy(), (32, 32), cv.INTER_AREA)
     predict_img = cv.cvtColor(predict_img, cv.COLOR_BGR2GRAY)
     predict_img = np.expand_dims(predict_img, axis=0)
     predict_img = np.expand_dims(predict_img, axis=3)
