@@ -1,3 +1,5 @@
+import math
+
 import cv2 as cv
 import numpy as np
 import tensorflow as tf
@@ -165,14 +167,19 @@ while cv.waitKey(1) < 0:
     cv.rectangle(frame, (min_x - 20, min_y - 20), (max_x + 20, max_y + 20), (0, 255, 255), thickness=2)
     cv.rectangle(frame, (min_x - 20, min_y - 60), (min_x + 30, min_y - 20), (0, 255, 255), thickness=-1)
 
-    # predict
-    # predict_img = frame[min_y-10: max_y+10, min_x-10: max_x+10].copy()
-    predict_img = cv.resize(frame[min_y-20: max_y+20, min_x-20: max_x+20].copy(), (32, 32), cv.INTER_AREA)
-    predict_img = cv.cvtColor(predict_img, cv.COLOR_BGR2GRAY)
-    predict_img = np.expand_dims(predict_img, axis=0)
-    predict_img = np.expand_dims(predict_img, axis=3)
     try:
-        cv.putText(frame, '%s' % labels[model.predict(predict_img)[0].tolist().index(1)], (min_x - 20, min_y - 20), cv.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), 2, lineType=cv.LINE_AA)
+        # predict
+        # predict_img = frame[min_y-10: max_y+10, min_x-10: max_x+10].copy()
+        predict_img = cv.resize(frame[min_y - 20: max_y + 20, min_x - 20: max_x + 20].copy(), (32, 32), cv.INTER_AREA)
+        predict_img = cv.cvtColor(predict_img, cv.COLOR_BGR2GRAY)
+        predict_img = np.expand_dims(predict_img, axis=0)
+        predict_img = np.expand_dims(predict_img, axis=3)
+        predict_img = predict_img / 255.0
+
+        predict = model.predict(predict_img).tolist()[0]
+        predict_acc = max(predict)
+        index = predict.index(predict_acc)
+        cv.putText(frame, f'is {labels[index]} ({round(predict_acc * 100, 1)})%', (min_x - 20, min_y - 20), cv.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), 2, lineType=cv.LINE_AA)
     except:
         cv.putText(frame, 'NONE', (min_x - 20, min_y - 20), cv.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), 2, lineType=cv.LINE_AA)
 
