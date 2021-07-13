@@ -96,6 +96,7 @@ def save_data_to_csv(images, labels, filename, trigger=True):
         folder = "test"
     path = f"./data/{folder}/{filename}.csv"
 
+    images = images.reshape(-1, 1024)
     pd.DataFrame(images).to_csv(path)
 
     print("end>> save .csv file success")
@@ -128,15 +129,99 @@ if __name__ == '__main__':
     # read data
     root = "/home/gibeom/dataset/asl_image_recognition"
     # case 1
-    train_images_alphabet, train_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_train.csv")
-    test_images_alphabet, test_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_test.csv")
+    # train_images_alphabet, train_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_train.csv")
+    # test_images_alphabet, test_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_test.csv")
     # case 2
-    # train_images_digit, train_labels_digit = get_image_data_for_dataloader(root + "/asl_digit/train")
-    # test_images_digit, test_labels_digit = get_image_data_for_dataloader(root + "/asl_digit/test")
+    train_images_digit, train_labels_digit = get_image_data_for_dataloader(root + "/asl_digit/train")
+    test_images_digit, test_labels_digit = get_image_data_for_dataloader(root + "/asl_digit/test")
     # # case 3
     # train_images = np.concatenate([train_images_alphabet, train_images_digit])
     # train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
     # test_images = np.concatenate([test_images_alphabet, test_images_digit])
     # test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
 
-    save_data_to_csv(train_images_alphabet, train_labels_alphabet, "test1")
+    # save .csv file
+    # save_data_to_csv(train_images_alphabet, train_labels_alphabet, "test1")
+
+    # Alphabet Dataset Show Table
+    #
+    # # DB 테이블
+    # alphabet_labels = []
+    # for i in range(26):
+    #     alphabet_labels.append(chr(i + 65))
+    #
+    # plt.figure(figsize=(30, 10))
+    # for i in range(4): # (4, 24) graph, j와 z는 단일 이미지 동작이 아니기 때문에 제외
+    #     for j in range(25):
+    #         if j == 9:
+    #             continue
+    #
+    #         plt.subplot(4, 25, (i * 25) + j + 1)
+    #         plt.xticks([])
+    #         plt.yticks([])
+    #         plt.grid(False)
+    #
+    #         train_find_index = np.where(train_labels_alphabet == j)[0]
+    #         test_find_index = np.where(test_labels_alphabet == j)[0]
+    #
+    #         if i == 0:
+    #             plt.imshow(train_images_alphabet[train_find_index[0]], cmap='gray')
+    #             plt.xlabel(alphabet_labels[j])
+    #
+    #             if j == 0:
+    #                 plt.ylabel("train")
+    #         elif i == 1:
+    #             plt.imshow(train_images_alphabet[train_find_index[len(train_find_index) - 1]], cmap='gray')
+    #             plt.xlabel(alphabet_labels[j])
+    #
+    #             if j == 0:
+    #                 plt.ylabel("train")
+    #         elif i == 2:
+    #             plt.imshow(test_images_alphabet[test_find_index[0]], cmap='gray')
+    #             plt.xlabel(alphabet_labels[j])
+    #
+    #             if j == 0:
+    #                 plt.ylabel("test")
+    #         else:
+    #             plt.imshow(test_images_alphabet[test_find_index[len(test_find_index) - 1]], cmap='gray')
+    #             plt.xlabel(alphabet_labels[j])
+    #
+    #             if j == 0:
+    #                 plt.ylabel("test")
+    # plt.show()
+
+
+    # Digit Dataset Show Table
+    # plt.figure(figsize=(30, 10))
+    #
+    # for i in range(4):
+    #     for j in range(10):
+    #         plt.subplot(4, 10, (i * 10) + j + 1)
+    #         plt.xticks([])
+    #         plt.yticks([])
+    #         plt.grid(False)
+    #
+    #         train_find_index = np.where(train_labels_digit == j)[0]
+    #         test_find_index = np.where(test_labels_digit == j)[0]
+    #
+    #         if i == 0:
+    #             plt.imshow(train_images_digit[train_find_index[0]], cmap='gray')
+    #             plt.xlabel(j)
+    #
+    #             if j == 0:
+    #                 plt.ylabel("train")
+    #         elif i == 1:
+    #             plt.imshow(train_images_digit[train_find_index[len(train_find_index) - 1]], cmap='gray')
+    #             plt.xlabel(j)
+    #
+    #         elif i == 2:
+    #             plt.imshow(test_images_digit[test_find_index[0]], cmap='gray')
+    #             plt.xlabel(j)
+    #
+    #             if j == 0:
+    #                 plt.ylabel("test")
+    #         else:
+    #             plt.imshow(test_images_digit[test_find_index[len(test_find_index) - 1]], cmap='gray')
+    #             plt.xlabel(j)
+    #
+    # plt.show()
