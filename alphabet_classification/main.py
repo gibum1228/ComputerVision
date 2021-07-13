@@ -26,15 +26,15 @@ if __name__ == "__main__":
     # test_images = test_images_alphabet
     # test_labels = test_labels_alphabet
     # case 2
-    train_images = train_images_digit
-    train_labels = train_labels_digit
-    test_images = test_images_digit
-    test_labels = test_labels_digit
+    # train_images = train_images_digit
+    # train_labels = train_labels_digit
+    # test_images = test_images_digit
+    # test_labels = test_labels_digit
     # case 3
-    # train_images = np.concatenate([train_images_alphabet, train_images_digit])
-    # train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
-    # test_images = np.concatenate([test_images_alphabet, test_images_digit])
-    # test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
+    train_images = np.concatenate([train_images_alphabet, train_images_digit])
+    train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
+    test_images = np.concatenate([test_images_alphabet, test_images_digit])
+    test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
 
     # Create an ImageDataGenerator and do Image Augmentation
     train_data = ImageDataGenerator(rescale=1.0 / 255.0,
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     history = model.fit(train_datagenerator,
                         validation_data=val_datagenerator,
                         steps_per_epoch=len(train_labels) // 32,
-                        epochs=1000,
+                        epochs=500,
                         validation_steps=len(test_labels) // 32)
 
     # history = model.fit(train_images,
@@ -90,10 +90,14 @@ if __name__ == "__main__":
     plt.xlabel('Epoch')
     plt.ylabel('loss')
     plt.legend(['Train', 'Test'], loc='upper left')
-    plt.show()
+    # plt.show()
 
     val_loss, val_acc = model.evaluate(val_datagenerator, verbose=0)
-    # model.save('alphabet_lenet5.h5')
+    model.save('./data/lenet5_asl_recognition_500.h5')
     print()
     print("val_acc =>", val_acc)
     print("val_loss =>", val_loss)
+    print()
+    print("train >>", len(train_images))
+    print("test >>", len(test_images))
+    plt.show()
