@@ -3,4 +3,4 @@
 <br>
 
 ### alphabet_classification
-- 단일 이미지 수어(알파벳) 번역하기
+- OpenPose에서 단일 이미지 수어(알파벳) 인식하기
