@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow.keras import models
 
 if __name__ == '__main__':
-    model = models.load_model('alphabet_lenet5.h5')
+    model = models.load_model('data/alphabet_lenet5.h5')
 
     img = cv.imread("/home/gibeom/dataset/asl_alphabet/asl_alphabet_train/asl_alphabet_train/R/R85.jpg", cv.IMREAD_GRAYSCALE)
 

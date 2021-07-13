@@ -70,7 +70,7 @@ inputWidth = 368
 inputScale = 1.0/255
 
 # 이미지 분류 모델 불러오기
-model = tf.keras.models.load_model('alphabet_lenet5.h5')
+model = tf.keras.models.load_model('data/alphabet_lenet5.h5')
 labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
           'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
