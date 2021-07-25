@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
+import collections
 from PIL import Image
 import matplotlib.pyplot as plt
 import torch
@@ -126,11 +126,13 @@ def get_32by32_data_for_csv(path):
 
 
 if __name__ == '__main__':
+    labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+              'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     # read data
     root = "/home/gibeom/dataset/asl_image_recognition"
     # case 1
-    # train_images_alphabet, train_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_train.csv")
-    # test_images_alphabet, test_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_test.csv")
+    train_images_alphabet, train_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_train.csv")
+    test_images_alphabet, test_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_test.csv")
     # case 2
     train_images_digit, train_labels_digit = get_image_data_for_dataloader(root + "/asl_digit/train")
     test_images_digit, test_labels_digit = get_image_data_for_dataloader(root + "/asl_digit/test")
@@ -190,7 +192,6 @@ if __name__ == '__main__':
     #                 plt.ylabel("test")
     # plt.show()
 
-
     # Digit Dataset Show Table
     # plt.figure(figsize=(30, 10))
     #
@@ -225,3 +226,20 @@ if __name__ == '__main__':
     #             plt.xlabel(j)
     #
     # plt.show()
+
+    # data info
+    train, test = [], []
+    for i in range(26):
+        train.append(collections.Counter(train_labels_alphabet)[i])
+        test.append(collections.Counter(test_labels_alphabet)[i])
+
+    train.append(" ")
+    test.append(" ")
+    train.append(len(train_labels_alphabet))
+    test.append(len(test_labels_alphabet))
+    df = pd.DataFrame({
+        "train data": train,
+        "test data": test
+    })
+
+    print(df)
