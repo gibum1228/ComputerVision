@@ -1,11 +1,13 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-from sklearn.metrics import classification_report
+import seaborn as sns
+from sklearn.metrics import classification_report, confusion_matrix
 
 import read_data
 
 if __name__ == "__main__":
-    model = tf.keras.models.load_model('data/lenet5_digit_1000.h5')
+    model = tf.keras.models.load_model('data/test_sgd.h5')
     labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
               'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
@@ -22,24 +24,40 @@ if __name__ == "__main__":
     # test_images = test_images_alphabet
     # test_labels = test_labels_alphabet
     # case 2
-    # train_images = train_images_digit
-    # train_labels = train_labels_digit
-    # test_images = test_images_digit
-    # test_labels = test_labels_digit
+    train_images = train_images_digit
+    train_labels = train_labels_digit
+    test_images = test_images_digit
+    test_labels = test_labels_digit
     # case 3
-    train_images = np.concatenate([train_images_alphabet, train_images_digit])
-    train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
-    test_images = np.concatenate([test_images_alphabet, test_images_digit])
-    test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
+    # train_images = np.concatenate([train_images_alphabet, train_images_digit])
+    # train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
+    # test_images = np.concatenate([test_images_alphabet, test_images_digit])
+    # test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
 
+    # predict
     pred = model.predict(test_images)
-    print(pred)
     pred = np.argmax(pred, axis=1)
-    print(pred)
 
-    test_labels = test_labels.astype('int64')
     # classification_report
+    test_labels = test_labels.astype('int64')
+    # y_test_word = [labels[i] for i in test_labels]
+    # pred_word = [labels[i] for i in pred]
     y_test_word = [i for i in test_labels]
     pred_word = [i for i in pred]
+    # print table
+    # print(classification_report(y_test_word, pred_word))
+    #
+    # val_loss, val_acc = model.evaluate(test_images, test_labels)
+    # print(val_acc)
+    # exit()
 
-    print(classification_report(y_test_word, pred_word))
+    # confusion matrix
+    cf_matrix = confusion_matrix(y_test_word, pred_word, normalize='true')
+    plt.figure(figsize=(30, 15))
+    sns.heatmap(cf_matrix, annot=True, xticklabels=sorted(set(y_test_word)), yticklabels=sorted(set(y_test_word)), cbar=False)
+    plt.title("Digit(SGD) Confusion Matrix\n", fontsize=25)
+    plt.xlabel("Predict", fontsize=20)
+    plt.ylabel("True", fontsize=20)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15, rotation=0)
+    plt.show()

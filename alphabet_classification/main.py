@@ -6,7 +6,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import tensorflow as tf
+from sklearn.metrics import classification_report, confusion_matrix
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from sklearn.model_selection import train_test_split
 
 import read_data
 import create_model
@@ -19,22 +21,27 @@ if __name__ == "__main__":
     train_images_digit, train_labels_digit = read_data.get_image_data_for_dataloader(root + "/asl_digit/train")
     test_images_digit, test_labels_digit = read_data.get_image_data_for_dataloader(root + "/asl_digit/test")
 
-
     # case 1
     # train_images = train_images_alphabet
     # train_labels = train_labels_alphabet
     # test_images = test_images_alphabet
     # test_labels = test_labels_alphabet
     # case 2
-    # train_images = train_images_digit
-    # train_labels = train_labels_digit
-    # test_images = test_images_digit
-    # test_labels = test_labels_digit
+    train_images = train_images_digit
+    train_labels = train_labels_digit
+    test_images = test_images_digit
+    test_labels = test_labels_digit
+    # case 2-1
+    # train_images, test_images, train_labels, test_labels = train_test_split(train_images_digit,
+    #                                                                         train_labels_digit,
+    #                                                                         test_size=0.1,
+    #                                                                         shuffle=True,
+    #                                                                         stratify=train_labels_digit)
     # case 3
-    train_images = np.concatenate([train_images_alphabet, train_images_digit])
-    train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
-    test_images = np.concatenate([test_images_alphabet, test_images_digit])
-    test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
+    # train_images = np.concatenate([train_images_alphabet, train_images_digit])
+    # train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
+    # test_images = np.concatenate([test_images_alphabet, test_images_digit])
+    # test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
 
     # Create an ImageDataGenerator and do Image Augmentation
     train_data = ImageDataGenerator(rescale=1.0 / 255.0,
@@ -49,10 +56,10 @@ if __name__ == "__main__":
     val_data = ImageDataGenerator(rescale=1.0 / 255)
     train_datagenerator = train_data.flow(train_images,
                                           train_labels,
-                                          batch_size=32)
+                                          batch_size=64)
     val_datagenerator = val_data.flow(test_images,
                              test_labels,
-                             batch_size=32)
+                             batch_size=64)
 
     # model init
     model = create_model.lenet5() # LeNet-5
@@ -65,9 +72,9 @@ if __name__ == "__main__":
 
     history = model.fit(train_datagenerator,
                         validation_data=val_datagenerator,
-                        steps_per_epoch=len(train_labels) // 32,
-                        epochs=500,
-                        validation_steps=len(test_labels) // 32)
+                        steps_per_epoch=len(train_labels) // 64,
+                        epochs=1000,
+                        validation_steps=len(test_labels) // 64)
 
     # history = model.fit(train_images,
     #                     train_labels,
@@ -75,29 +82,49 @@ if __name__ == "__main__":
     #                     epochs=50)
 
     # 훈련 과정 시각화 (정확도)
-    plt.subplot(1, 2, 1)
-    plt.plot(history.history['accuracy'])
-    plt.plot(history.history['val_accuracy'])
-    plt.title('Model Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('acc')
-    plt.legend(['Train', 'Test'], loc='upper left')
+    # plt.subplot(1, 2, 1)
+    # plt.plot(history.history['accuracy'])
+    # plt.plot(history.history['val_accuracy'])
+    # plt.title('Model Accuracy')
+    # plt.xlabel('Epoch')
+    # plt.ylabel('acc')
+    # plt.legend(['Train', 'Test'], loc='upper left')
     # 훈련 과정 시각화 (손실)
-    plt.subplot(1, 2, 2)
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('Model Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('loss')
-    plt.legend(['Train', 'Test'], loc='upper left')
+    # plt.subplot(1, 2, 2)
+    # plt.plot(history.history['loss'])
+    # plt.plot(history.history['val_loss'])
+    # plt.title('Model Loss')
+    # plt.xlabel('Epoch')
+    # plt.ylabel('loss')
+    # plt.legend(['Train', 'Test'], loc='upper left')
     # plt.show()
 
-    val_loss, val_acc = model.evaluate(val_datagenerator, verbose=0)
-    model.save('./data/lenet5_asl_recognition_500.h5')
+    # evaluate case 1
+    val_loss, val_acc = model.evaluate(test_images, test_labels, verbose=0)
+    model.save('./data/lenet5_digit_adam.h5')
     print()
     print("val_acc =>", val_acc)
     print("val_loss =>", val_loss)
-    print()
-    print("train >>", len(train_images))
-    print("test >>", len(test_images))
+
+    # evaluate case 2
+    pred = model.predict(test_images)
+    pred = np.argmax(pred, axis=1)
+
+    test_labels = test_labels.astype('int64')
+    # classification_report
+    y_test_word = [i for i in test_labels]
+    pred_word = [i for i in pred]
+
+    print(classification_report(y_test_word, pred_word))
+
+    # confusion matrix
+    cf_matrix = confusion_matrix(y_test_word, pred_word, normalize='true')
+    plt.figure(figsize=(30, 15))
+    sns.heatmap(cf_matrix, annot=True, xticklabels=sorted(set(y_test_word)), yticklabels=sorted(set(y_test_word)),
+                cbar=False)
+    plt.title("Digit(Adam) Confusion Matrix\n", fontsize=25)
+    plt.xlabel("Predict", fontsize=20)
+    plt.ylabel("True", fontsize=20)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15, rotation=0)
     plt.show()
