@@ -35,12 +35,12 @@ def lenet5():
         layers.Flatten(),
         layers.Dense(120, activation='relu'),
         layers.Dense(84, activation='relu'),
-        layers.Dense(25, activation='softmax')
+        layers.Dense(10, activation='softmax')
     ])
 
     # Compiling the Model.
     model.compile(loss='sparse_categorical_crossentropy',
-                  optimizer='Adam',
+                  optimizer=tf.keras.optimizers.Adam(),
                   metrics=['accuracy'])
 
     # create lenet5 network structure .png
