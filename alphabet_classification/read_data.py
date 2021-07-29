@@ -78,12 +78,13 @@ def get_image_data_for_dataloader(path):
             image, label = data_iter.next()
 
             images = np.append(images, image.numpy().reshape(-1, 32, 32, 1), axis=0)
+            # images = np.append(images, np.expand_dims(image.numpy(), axis=3), axis=0)
             labels = np.append(labels, label.numpy(), axis=0)
+
     except Exception:
         print()
 
     print("end>> get_image_data_for_dataloader() success")
-
     return images, labels
 
 
@@ -227,7 +228,7 @@ if __name__ == '__main__':
     #
     # plt.show()
 
-    # data info
+    # show dataframe table info
     train, test = [], []
     for i in range(26):
         train.append(collections.Counter(train_labels_alphabet)[i])
@@ -241,5 +242,4 @@ if __name__ == '__main__':
         "train data": train,
         "test data": test
     })
-
     print(df)
