@@ -35,7 +35,7 @@ def lenet5():
         layers.Flatten(),
         layers.Dense(120, activation='relu'),
         layers.Dense(84, activation='relu'),
-        layers.Dense(10, activation='softmax')
+        layers.Dense(36, activation='softmax')
     ])
 
     # Compiling the Model.
