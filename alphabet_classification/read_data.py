@@ -48,6 +48,9 @@ def get_32by32_data_for_28by28_data(path):
 
     print("end>> get_32by32_data_for_28by28_data() success")
 
+    # Normalized
+    result_images = result_images / 255.0
+
     return result_images, labels
 
 
