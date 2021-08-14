@@ -18,33 +18,50 @@ if __name__ == "__main__":
     root = "/home/gibeom/dataset/asl_image_recognition"
     train_images_alphabet, train_labels_alphabet = read_data.get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_train.csv")
     test_images_alphabet, test_labels_alphabet = read_data.get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_test.csv")
-    train_images_digit, train_labels_digit = read_data.get_image_data_for_dataloader(root + "/asl_digit/train")
-    test_images_digit, test_labels_digit = read_data.get_image_data_for_dataloader(root + "/asl_digit/test")
+    images_1, labels_1 = read_data.get_image_data_for_dataloader(root + "/asl_digit/1")
+    images_2, labels_2 = read_data.get_image_data_for_dataloader(root + "/asl_digit/2")
 
     # case 1
     # train_images = train_images_alphabet
     # train_labels = train_labels_alphabet
     # test_images = test_images_alphabet
     # test_labels = test_labels_alphabet
-    # case 2
-    train_images = train_images_digit
-    train_labels = train_labels_digit
-    test_images = test_images_digit
-    test_labels = test_labels_digit
-    # case 2-1
-    # train_images, test_images, train_labels, test_labels = train_test_split(train_images_digit,
-    #                                                                         train_labels_digit,
-    #                                                                         test_size=0.1,
-    #                                                                         shuffle=True,
-    #                                                                         stratify=train_labels_digit)
+    # case 2 original
+    train_images_1, test_images_1, train_labels_1, test_labels_1 = train_test_split(images_1,
+                                                                            labels_1,
+                                                                            test_size=0.1,
+                                                                            shuffle=True,
+                                                                            stratify=labels_1)
+    train_images_2, test_images_2, train_labels_2, test_labels_2 = train_test_split(images_2,
+                                                                                    labels_2,
+                                                                                    test_size=0.1,
+                                                                                    shuffle=True,
+                                                                                    stratify=labels_2)
+    # train_images = np.concatenate([train_images_1, train_images_2])
+    # train_labels = np.concatenate([train_labels_1, train_labels_2])
+    # test_images = np.concatenate([test_images_1, test_images_2])
+    # test_labels = np.concatenate([test_labels_1, test_labels_2])
+
+    # print(train_images.shape) # (28855, 32, 32, 1)
+    # print(train_labels.shape) # (28855, )
+    # print(test_images.shape) # (3207, 32, 32, 1)
+    # print(test_labels.shape) # (3207, )
+    # exit()
     # case 3
-    # train_images = np.concatenate([train_images_alphabet, train_images_digit])
-    # train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
-    # test_images = np.concatenate([test_images_alphabet, test_images_digit])
-    # test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
+    train_images_digit = np.concatenate([train_images_1, train_images_2])
+    train_labels_digit = np.concatenate([train_labels_1, train_labels_2])
+    test_images_digit = np.concatenate([test_images_1, test_images_2])
+    test_labels_digit = np.concatenate([test_labels_1, test_labels_2])
+    train_labels_alphabet = train_labels_alphabet + 10
+    test_labels_alphabet = test_labels_alphabet + 10
+
+    train_images = np.concatenate([train_images_alphabet, train_images_digit])
+    train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
+    test_images = np.concatenate([test_images_alphabet, test_images_digit])
+    test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
 
     # Create an ImageDataGenerator and do Image Augmentation
-    train_data = ImageDataGenerator(rescale=1.0 / 255.0,
+    train_data = ImageDataGenerator(rescale=1.0 / 1.0,
                                        height_shift_range=0.1,
                                        width_shift_range=0.1,
                                        zoom_range=0.1,
@@ -53,7 +70,7 @@ if __name__ == "__main__":
                                        fill_mode='nearest',
                                        horizontal_flip=True)
     # Image Augmentation is not done on the testing data
-    val_data = ImageDataGenerator(rescale=1.0 / 255)
+    val_data = ImageDataGenerator(rescale=1.0 / 1.0)
     train_datagenerator = train_data.flow(train_images,
                                           train_labels,
                                           batch_size=64)
@@ -101,7 +118,7 @@ if __name__ == "__main__":
 
     # evaluate case 1
     val_loss, val_acc = model.evaluate(test_images, test_labels, verbose=0)
-    model.save('./data/lenet5_digit_adam.h5')
+    model.save('./data/lenet5_recognition_1000_v2.h5')
     print()
     print("val_acc =>", val_acc)
     print("val_loss =>", val_loss)
@@ -122,7 +139,7 @@ if __name__ == "__main__":
     plt.figure(figsize=(30, 15))
     sns.heatmap(cf_matrix, annot=True, xticklabels=sorted(set(y_test_word)), yticklabels=sorted(set(y_test_word)),
                 cbar=False)
-    plt.title("Digit(Adam) Confusion Matrix\n", fontsize=25)
+    plt.title("ASL Recognition Confusion Matrix\n", fontsize=25)
     plt.xlabel("Predict", fontsize=20)
     plt.ylabel("True", fontsize=20)
     plt.xticks(fontsize=15)
