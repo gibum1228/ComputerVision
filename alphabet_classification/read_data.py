@@ -14,6 +14,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision
 from torchvision import transforms
+from sklearn.model_selection import train_test_split
 
 
 def get_32by32_data_for_28by28_data(path):
@@ -130,21 +131,61 @@ def get_32by32_data_for_csv(path):
 
 
 if __name__ == '__main__':
-    labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8','9',
+              'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
               'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     # read data
     root = "/home/gibeom/dataset/asl_image_recognition"
-    # case 1
     train_images_alphabet, train_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_train.csv")
     test_images_alphabet, test_labels_alphabet = get_32by32_data_for_28by28_data(root + "/asl_alphabet/sign_mnist_test.csv")
-    # case 2
-    train_images_digit, train_labels_digit = get_image_data_for_dataloader(root + "/asl_digit/train")
-    test_images_digit, test_labels_digit = get_image_data_for_dataloader(root + "/asl_digit/test")
-    # # case 3
-    # train_images = np.concatenate([train_images_alphabet, train_images_digit])
-    # train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
-    # test_images = np.concatenate([test_images_alphabet, test_images_digit])
-    # test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
+    images_1, labels_1 = get_image_data_for_dataloader(root + "/asl_digit/1")
+    images_2, labels_2 = get_image_data_for_dataloader(root + "/asl_digit/2")
+
+    # case 1
+    # train_images = train_images_alphabet
+    # train_labels = train_labels_alphabet
+    # test_images = test_images_alphabet
+    # test_labels = test_labels_alphabet
+    # case 2 original
+    train_images_1, test_images_1, train_labels_1, test_labels_1 = train_test_split(images_1,
+                                                                                    labels_1,
+                                                                                    test_size=0.1,
+                                                                                    shuffle=True,
+                                                                                    stratify=labels_1)
+    train_images_2, test_images_2, train_labels_2, test_labels_2 = train_test_split(images_2,
+                                                                                    labels_2,
+                                                                                    test_size=0.1,
+                                                                                    shuffle=True,
+                                                                                    stratify=labels_2)
+    # train_images = np.concatenate([train_images_1, train_images_2])
+    # train_labels = np.concatenate([train_labels_1, train_labels_2])
+    # test_images = np.concatenate([test_images_1, test_images_2])
+    # test_labels = np.concatenate([test_labels_1, test_labels_2])
+
+    # print(train_images.shape) # (28855, 32, 32, 1)
+    # print(train_labels.shape) # (28855, )
+    # print(test_images.shape) # (3207, 32, 32, 1)
+    # print(test_labels.shape) # (3207, )
+    # exit()
+    # case 3
+    train_images_digit = np.concatenate([train_images_1, train_images_2])
+    train_labels_digit = np.concatenate([train_labels_1, train_labels_2])
+    test_images_digit = np.concatenate([test_images_1, test_images_2])
+    test_labels_digit = np.concatenate([test_labels_1, test_labels_2])
+    train_labels_alphabet = train_labels_alphabet + 10
+    test_labels_alphabet = test_labels_alphabet + 10
+
+    train_images = np.concatenate([train_images_alphabet, train_images_digit])
+    train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
+    test_images = np.concatenate([test_images_alphabet, test_images_digit])
+    test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
+
+    # print shape
+    print(f"alphabet train data>> {train_images_alphabet.shape}")
+    print(f"alphabet test data>> {test_images_alphabet.shape}")
+    print(f"digit train data>> {train_images_digit.shape}")
+    print(f"digit test data>> {test_images_digit.shape}")
+    exit()
 
     # save .csv file
     # save_data_to_csv(train_images_alphabet, train_labels_alphabet, "test1")
