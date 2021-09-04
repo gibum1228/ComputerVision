@@ -50,9 +50,9 @@ threshold = 0.1
 
 # 모델을 구성하는 레이어들의 속성이 포함되어 있다.
 # 이미지를 입력으로 학습이 완료된 모델을 사용하려면 필요하다
-protoFile = "pose_deploy.prototxt"
+protoFile = "data/pose_deploy.prototxt"
 # 학습 완료된 모델이 저장되어 있는 파일
-weightsFile = "pose_iter_102000.caffemodel"
+weightsFile = "data/pose_iter_102000.caffemodel"
 
 # 네트워크 불러오기
 net = cv.dnn.readNetFromCaffe(protoFile, weightsFile)
@@ -70,8 +70,9 @@ inputWidth = 368
 inputScale = 1.0/255
 
 # 이미지 분류 모델 불러오기
-model = tf.keras.models.load_model('data/alphabet_lenet5.h5')
-labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+model = tf.keras.models.load_model('data/lenet5_recognition_1000_v2_acc99.h5')
+labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+          'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
           'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 # 아무키나 누르면 프로그램 종료
