@@ -22,10 +22,10 @@ if __name__ == "__main__":
     images_2, labels_2 = read_data.get_image_data_for_dataloader(root + "/asl_digit/2")
 
     # case 1
-    # train_images = train_images_alphabet
-    # train_labels = train_labels_alphabet
-    # test_images = test_images_alphabet
-    # test_labels = test_labels_alphabet
+    train_images = train_images_alphabet
+    train_labels = train_labels_alphabet
+    test_images = test_images_alphabet
+    test_labels = test_labels_alphabet
     # case 2 original
     train_images_1, test_images_1, train_labels_1, test_labels_1 = train_test_split(images_1,
                                                                             labels_1,
@@ -48,17 +48,17 @@ if __name__ == "__main__":
     # print(test_labels.shape) # (3207, )
     # exit()
     # case 3
-    train_images_digit = np.concatenate([train_images_1, train_images_2])
-    train_labels_digit = np.concatenate([train_labels_1, train_labels_2])
-    test_images_digit = np.concatenate([test_images_1, test_images_2])
-    test_labels_digit = np.concatenate([test_labels_1, test_labels_2])
-    train_labels_alphabet = train_labels_alphabet + 10
-    test_labels_alphabet = test_labels_alphabet + 10
-
-    train_images = np.concatenate([train_images_alphabet, train_images_digit])
-    train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
-    test_images = np.concatenate([test_images_alphabet, test_images_digit])
-    test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
+    # train_images_digit = np.concatenate([train_images_1, train_images_2])
+    # train_labels_digit = np.concatenate([train_labels_1, train_labels_2])
+    # test_images_digit = np.concatenate([test_images_1, test_images_2])
+    # test_labels_digit = np.concatenate([test_labels_1, test_labels_2])
+    # train_labels_alphabet = train_labels_alphabet + 10
+    # test_labels_alphabet = test_labels_alphabet + 10
+    #
+    # train_images = np.concatenate([train_images_alphabet, train_images_digit])
+    # train_labels = np.concatenate([train_labels_alphabet, train_labels_digit])
+    # test_images = np.concatenate([test_images_alphabet, test_images_digit])
+    # test_labels = np.concatenate([test_labels_alphabet, test_labels_digit])
 
     # Create an ImageDataGenerator and do Image Augmentation
     train_data = ImageDataGenerator(rescale=1.0 / 1.0,
@@ -81,28 +81,17 @@ if __name__ == "__main__":
     # model init
     model = create_model.lenet5() # LeNet-5
 
-    # Compiling the Model.
-    # model = tf.keras.applications.DenseNet201(input_shape=(32, 32, 3), include_top=False, pooling='avg')
-    # model.compile(loss='sparse_categorical_crossentropy',
-    #               optimizer='Adam',
-    #               metrics=['accuracy'])
-
     history = model.fit(train_datagenerator,
                         validation_data=val_datagenerator,
                         steps_per_epoch=len(train_labels) // 64,
                         epochs=1000,
                         validation_steps=len(test_labels) // 64)
 
-    # history = model.fit(train_images,
-    #                     train_labels,
-    #                     validation_data=(test_images, test_labels),
-    #                     epochs=50)
-
     # 훈련 과정 시각화 (정확도)
     # plt.subplot(1, 2, 1)
     # plt.plot(history.history['accuracy'])
     # plt.plot(history.history['val_accuracy'])
-    # plt.title('Model Accuracy')
+    # plt.title('Case-3 Train Accuracy')
     # plt.xlabel('Epoch')
     # plt.ylabel('acc')
     # plt.legend(['Train', 'Test'], loc='upper left')
@@ -118,30 +107,31 @@ if __name__ == "__main__":
 
     # evaluate case 1
     val_loss, val_acc = model.evaluate(test_images, test_labels, verbose=0)
-    model.save('./data/lenet5_recognition_1000_v2.h5')
+    model.save('./data/case1_1000.h5')
     print()
     print("val_acc =>", val_acc)
     print("val_loss =>", val_loss)
+    print("train_accuracy =>", sum(history.history['accuracy']) / len(history.history['accuracy']))
 
     # evaluate case 2
-    pred = model.predict(test_images)
-    pred = np.argmax(pred, axis=1)
-
-    test_labels = test_labels.astype('int64')
-    # classification_report
-    y_test_word = [i for i in test_labels]
-    pred_word = [i for i in pred]
-
-    print(classification_report(y_test_word, pred_word))
-
-    # confusion matrix
-    cf_matrix = confusion_matrix(y_test_word, pred_word, normalize='true')
-    plt.figure(figsize=(30, 15))
-    sns.heatmap(cf_matrix, annot=True, xticklabels=sorted(set(y_test_word)), yticklabels=sorted(set(y_test_word)),
-                cbar=False)
-    plt.title("ASL Recognition Confusion Matrix\n", fontsize=25)
-    plt.xlabel("Predict", fontsize=20)
-    plt.ylabel("True", fontsize=20)
-    plt.xticks(fontsize=15)
-    plt.yticks(fontsize=15, rotation=0)
-    plt.show()
+    # pred = model.predict(test_images)
+    # pred = np.argmax(pred, axis=1)
+    #
+    # test_labels = test_labels.astype('int64')
+    # # classification_report
+    # y_test_word = [i for i in test_labels]
+    # pred_word = [i for i in pred]
+    #
+    # print(classification_report(y_test_word, pred_word))
+    #
+    # # confusion matrix
+    # cf_matrix = confusion_matrix(y_test_word, pred_word, normalize='true')
+    # plt.figure(figsize=(30, 15))
+    # sns.heatmap(cf_matrix, annot=True, xticklabels=sorted(set(y_test_word)), yticklabels=sorted(set(y_test_word)),
+    #             cbar=False)
+    # plt.title("ASL Recognition Confusion Matrix\n", fontsize=25)
+    # plt.xlabel("Predict", fontsize=20)
+    # plt.ylabel("True", fontsize=20)
+    # plt.xticks(fontsize=15)
+    # plt.yticks(fontsize=15, rotation=0)
+    # plt.show()
