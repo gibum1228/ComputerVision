@@ -70,7 +70,7 @@ inputWidth = 368
 inputScale = 1.0/255
 
 # 이미지 분류 모델 불러오기
-model = tf.keras.models.load_model('data/lenet5_recognition_1000_v2_acc99.h5')
+model = tf.keras.models.load_model('data/case3_1000.h5')
 labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
           'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
           'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
