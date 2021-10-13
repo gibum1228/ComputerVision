@@ -1,8 +1,11 @@
 import math
+import random
 
 import cv2 as cv
 import numpy as np
 import tensorflow as tf
+
+
 
 BODY_PARTS = {
                 "손목": 0,
@@ -70,16 +73,44 @@ inputWidth = 368
 inputScale = 1.0/255
 
 # 이미지 분류 모델 불러오기
+"""
+model: case 3에 해당하는 네트워크
+lables: 예측 결과와 매칭하기 위한 단어
+show_skeleton: 손 스켈레톤 온오프 -> default value is False
+show_bbox: 박스 온오프 -> default value is False
+line_color_box: 선 색깔 종류
+"""
 model = tf.keras.models.load_model('data/case3_1000.h5')
 labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
           'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
           'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+show_skeleton = False
+show_bbox = False
+b, g, r = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+line_color_box = [
+    (b, g, r), (g, r, b), (r, g, b), (r, b, g), (g, b, r),
+    (b, g, r), (g, r, b), (r, g, b), (r, b, g), (g, b, r),
+    (b, g, r), (g, r, b), (r, g, b), (r, b, g), (g, b, r),
+    (b, g, r), (g, r, b), (r, g, b), (r, b, g), (g, b, r)
+]
 
 # 아무키나 누르면 프로그램 종료
-while cv.waitKey(1) < 0:
+while True:
+    # key
+    op = cv.waitKey(1)
+    if op >= 0:
+        if op == 27:
+            break
+        elif op == 83 or op == 115:
+            show_skeleton = not show_skeleton
+            print(show_skeleton)
+        elif op == 66 or op == 98:
+            show_bbox = not show_bbox
+            print(show_bbox)
+
     # 웹캠으로부터 영상 하나 가져오기
     hasFrame, frame = cap.read()
-   # frame = cv.resize(frame, dsize=(320, 240), interpolation=cv.INTER_AREA)
+    # frame = cv.resize(frame, dsize=(368, 368), interpolation=cv.INTER_AREA)
 
     # 웹캠으로부터 영상을 가져올 수 없으면 프로그램 종료
     if not hasFrame:
@@ -135,54 +166,58 @@ while cv.waitKey(1) < 0:
             스레쉬 홀드가 작으면 손가락 부분이 잘 검출되지만 주변의 다른 물체를 같이 연결하여 손가락으로 오인식하는 것이 많아짐
             스레쉬홀드가 커지면 손가락 부분이 덜 검출되며 주변의 다른 물체를 같이 연결하여 손가락으로 오인식하는게 줄어드는 듯 함
         '''
-        '''
-        if conf > threshold:
-            # 해당 부분에 원과 숫자를 표시한 후, 해당 좌표를 리스트에 삽입
-            cv.circle(frame, (x, y), 3, (0, 255, 255), thickness=-1, lineType=cv.FILLED)
-            cv.putText(frame, "{}".format(i), (x, y), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 1, lineType=cv.LINE_AA)
-            points.append((x, y))
-        else:
-            points.append(None)
-        '''
+        if show_skeleton:
+            if conf > threshold:
+                # 해당 부분에 원과 숫자를 표시한 후, 해당 좌표를 리스트에 삽입
+                cv.circle(frame, (x, y), 3, (0, 255, 255), thickness=-1, lineType=cv.FILLED)
+                # cv.putText(frame, "{}".format(i), (x, y), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 1, lineType=cv.LINE_AA)
+                points.append((x, y))
+            else:
+                points.append(None)
 
     # 모든 손가락 연결 관계에 대해
-    '''
-    for pair in POSE_PAIRS:
-        partFrom = pair[0]
-        partTo = pair[1]
+    if show_skeleton:
+        for pair in POSE_PAIRS:
+            partFrom = pair[0]
+            partTo = pair[1]
 
-        idFrom = BODY_PARTS[partFrom]
-        idTo = BODY_PARTS[partTo]
+            idFrom = BODY_PARTS[partFrom]
+            idTo = BODY_PARTS[partTo]
 
-        # 앞 과정에서 두 부분이 모두 검출되어 두 부분이 모두 존재하면 연결하는 선을 그려줌
-        if points[idFrom] and points[idTo]:
-            cv.line(frame, points[idFrom], points[idTo], (0, 255, 0), 1)
-    '''
+            # 앞 과정에서 두 부분이 모두 검출되어 두 부분이 모두 존재하면 연결하는 선을 그려줌
+            if points[idFrom] and points[idTo]:
+                cv.line(frame, points[idFrom], points[idTo], (200, 100, 0), 5)
     
     # 추론하는데 걸린 시간을 화면에 출력
     t, _ = net.getPerfProfile()
     freq = cv.getTickFrequency() / 1000
     cv.putText(frame, '%.2fms' % (t / freq), (10, 20), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
 
-    # hand detection
-    cv.rectangle(frame, (min_x - 20, min_y - 20), (max_x + 20, max_y + 20), (0, 255, 255), thickness=2)
-    cv.rectangle(frame, (min_x - 20, min_y - 60), (min_x + 30, min_y - 20), (0, 255, 255), thickness=-1)
+
 
     try:
-        # predict
-        # predict_img = frame[min_y-10: max_y+10, min_x-10: max_x+10].copy()
-        predict_img = cv.resize(frame[min_y - 20: max_y + 20, min_x - 20: max_x + 20].copy(), (32, 32), cv.INTER_AREA)
-        predict_img = cv.cvtColor(predict_img, cv.COLOR_BGR2GRAY)
-        predict_img = np.expand_dims(predict_img, axis=0)
-        predict_img = np.expand_dims(predict_img, axis=3)
-        predict_img = predict_img / 255.0
+        if show_bbox:
+            # hand detection
+            cv.rectangle(frame, (min_x - 20, min_y - 20), (max_x + 20, max_y + 20), (0, 255, 255), thickness=2)
+            cv.rectangle(frame, (min_x - 20, min_y - 60), (min_x + 30, min_y - 20), (0, 255, 255), thickness=-1)
 
-        predict = model.predict(predict_img).tolist()[0]
-        predict_acc = max(predict)
-        index = predict.index(predict_acc)
-        cv.putText(frame, f'is {labels[index]} ({round(predict_acc * 100, 1)})%', (min_x - 20, min_y - 20), cv.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), 2, lineType=cv.LINE_AA)
+            # predict
+            # predict_img = frame[min_y-10: max_y+10, min_x-10: max_x+10].copy()
+            predict_img = cv.resize(frame[min_y - 20: max_y + 20, min_x - 20: max_x + 20].copy(), (32, 32),
+                                    cv.INTER_AREA)
+            predict_img = cv.cvtColor(predict_img, cv.COLOR_BGR2GRAY)
+            predict_img = np.expand_dims(predict_img, axis=0)
+            predict_img = np.expand_dims(predict_img, axis=3)
+            predict_img = predict_img / 255.0
+
+            predict = model.predict(predict_img).tolist()[0]
+            predict_acc = max(predict)
+            index = predict.index(predict_acc)
+            cv.putText(frame, f'is {labels[index]} ({round(predict_acc * 100, 1)})%', (min_x - 20, min_y - 20),
+                       cv.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), 2, lineType=cv.LINE_AA)
     except:
-        cv.putText(frame, 'NONE', (min_x - 20, min_y - 20), cv.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), 2, lineType=cv.LINE_AA)
+        cv.putText(frame, 'NONE', (min_x - 20, min_y - 20), cv.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), 2,
+                   lineType=cv.LINE_AA)
 
     # 손가락 검출 결과가 반영된 영상을 보여줌
     cv.imshow('Computer Vision lab, Horaeng', frame)
