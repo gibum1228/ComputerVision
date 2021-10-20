@@ -5,6 +5,7 @@ ASL(American Sign Language)인 A-Z, 0-9를 의미하는 단일 동작을 실시�
 
 ## Contents
 - [Environment](#Environment)
+- [Data](#Data)
 - [Installation](#Installation)
 - [Start](#Start)
 - [Author](#Author)
@@ -14,6 +15,11 @@ ASL(American Sign Language)인 A-Z, 0-9를 의미하는 단일 동작을 실시�
 - GeForce RTX 3090
 - TensorFlow 2.5
 - python 3.8
+
+## Data
+1. [Alphabet](https://www.kaggle.com/datamunge/sign-language-mnist)
+2. [Digit #1](https://paperswithcode.com/sota/image-classification-on-imagenet)
+3. [Digit #2](https://paperswithcode.com/sota/image-classification-on-cifar-100)
 
 ## Installation
 1. clone repository
